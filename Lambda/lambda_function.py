@@ -1,5 +1,5 @@
 ### Required Libraries ###
-from datetime import datetime
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 ### Functionality Helper Functions ###
@@ -111,6 +111,46 @@ In this section, you will create an Amazon Lambda function that will validate th
 
 """
 
+def validate_data(first_name, age, investment_amount, risk_level, intent_request):
+    '''
+    Validates the data provided by the user
+    '''
+
+    # Validate that age is greater than zero and less than 65
+    if age is not None:
+        age = parse_int(age)
+        if age is not range(1, 65):
+            return build_validation_result(
+                False,
+                "age",
+                "You should be already in retirement or are less than one year old to invest in our investment portfolio. Good luck!"
+            )
+    
+    # Validate that the investment amount is equal to or greater than 5000.
+    if investment_amount is not None:
+        investment_amount = parse_int(investment_amount)
+        if investment_amount < 5000:
+            return build_validation_result(
+                False,
+                "investmentAmount",
+                "The minimum required investment in our portfolio is 5,000, "
+                "please make more money and come back.",
+            )
+
+    # Valida the risk level of the applicant
+    if risk_level is not None:
+        if risk_level is not 'None':
+            if risk_level is not 'Low':
+                if risk_level is not 'Medium':
+                    if risk_level is not 'High':
+                        return build_validation_result(
+                            False,
+                            "riskLevel",
+                            "Please select one of these options: None, Low, Medium or High",
+                        )
+    return build_validation_result(True, None, None)
+
+    
 
 ### Intents Handlers ###
 def recommend_portfolio(intent_request):
@@ -124,7 +164,35 @@ def recommend_portfolio(intent_request):
     risk_level = get_slots(intent_request)["riskLevel"]
     source = intent_request["invocationSource"]
 
-    # YOUR CODE GOES HERE!
+    if source == 'DialogCodeHook':
+        # This code performs basic validation on the supplied input slots.
+
+        # Gets all slots
+        slots = get_slots(intent_request)
+
+        # Validates user's input using the validate_data function
+        validation_result = validate_data(first_name, age, investment_amount, risk_level, intent_request)
+
+        # If the data provided by the user is not valid,
+        # the elicitSlot dialog action is used to re-prompt for the first violation detected.
+        if not validation_result["isValid"]:
+            slots[validation_result["violatedSlot"]] = None  # Cleans invalid slot
+
+            # Returns an elicitSlot dialog to request new data for the invalid slot
+            return elicit_slot(
+                intent_request["sessionAttributes"],
+                intent_request["currentIntent"]["name"],
+                slots,
+                validation_result["violatedSlot"],
+                validation_result["message"],
+            )
+
+        # Fetch current session attributes
+        output_session_attributes = intent_request["sessionAttributes"]
+
+        # Once all slots are valid, a delegate dialog is returned to Lex to choose the next course of action.
+        return delegate(output_session_attributes, get_slots(intent_request))
+
 
 
 ### Intents Dispatcher ###
