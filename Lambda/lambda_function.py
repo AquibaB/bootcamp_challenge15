@@ -119,11 +119,18 @@ def validate_data(first_name, age, investment_amount, risk_level, intent_request
     # Validate that age is greater than zero and less than 65
     if age is not None:
         age = parse_int(age)
-        if age is not range(1, 65):
+        if age > 65:
             return build_validation_result(
                 False,
                 "age",
                 "You should be already in retirement or are less than one year old to invest in our investment portfolio. Good luck!"
+            )
+        
+        if age == 0:
+            return build_validation_result(
+                False,
+                "age",
+                "You are too young to invest. Go learn how to walk and talk first!"
             )
     
     # Validate that the investment amount is equal to or greater than 5000.
@@ -137,17 +144,7 @@ def validate_data(first_name, age, investment_amount, risk_level, intent_request
                 "please make more money and come back.",
             )
 
-    # Valida the risk level of the applicant
-    if risk_level is not None:
-        if risk_level is not 'None':
-            if risk_level is not 'Low':
-                if risk_level is not 'Medium':
-                    if risk_level is not 'High':
-                        return build_validation_result(
-                            False,
-                            "riskLevel",
-                            "Please select one of these options: None, Low, Medium or High",
-                        )
+
     return build_validation_result(True, None, None)
 
     
