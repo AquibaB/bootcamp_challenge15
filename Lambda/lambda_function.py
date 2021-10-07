@@ -143,7 +143,17 @@ def validate_data(first_name, age, investment_amount, risk_level, intent_request
                 "The minimum required investment in our portfolio is 5,000, "
                 "please make more money and come back.",
             )
-
+    if risk_level is not None:
+        risk_level = str(risk_level)
+        if risk_level != 'None':
+            if risk_level != 'Low':
+                if risk_level != 'Medium':
+                    if risk_level != 'High':
+                        return build_validation_result(
+                            False,
+                            "investmentAmount",
+                            "Please start again and select a valid option: None, Low, Medium or High",
+                        )
 
     return build_validation_result(True, None, None)
 
