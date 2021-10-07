@@ -193,7 +193,54 @@ def recommend_portfolio(intent_request):
         # Once all slots are valid, a delegate dialog is returned to Lex to choose the next course of action.
         return delegate(output_session_attributes, get_slots(intent_request))
 
+    # Return a message with an investment recommendation based on the selected risk level
+    if risk_level == 'None':    
+        return close(
+            intent_request["sessionAttributes"],
+            "Fulfilled",
+            {
+                "contentType": "PlainText",
+                "content": """
+                We recomment the following investment allocation: 100% bonds (AGG), 0% equities (SPY)
+                """
+            },
+        )
 
+    if risk_level == 'Low':    
+        return close(
+            intent_request["sessionAttributes"],
+            "Fulfilled",
+            {
+                "contentType": "PlainText",
+                "content": """
+                We recomment the following investment allocation: 60% bonds (AGG), 40% equities (SPY)
+                """
+            },
+        )
+
+    if risk_level == 'Medium':    
+        return close(
+            intent_request["sessionAttributes"],
+            "Fulfilled",
+            {
+                "contentType": "PlainText",
+                "content": """
+                We recomment the following investment allocation: 40% bonds (AGG), 60% equities (SPY)
+                """
+            },
+        )
+
+    if risk_level == 'High':    
+        return close(
+            intent_request["sessionAttributes"],
+            "Fulfilled",
+            {
+                "contentType": "PlainText",
+                "content": """
+                We recomment the following investment allocation: 20% bonds (AGG), 80% equities (SPY)
+                """
+            },
+        )
 
 ### Intents Dispatcher ###
 def dispatch(intent_request):
